@@ -272,23 +272,23 @@ class Bluepy:
 
             resp = Bluepy.parseResp(rv)
             if 'rsp' not in resp:
-                raise BTLEException(BTLEException.INTERNAL_ERROR, "No response type indicator")
+                raise BTLEException(BTLEException.INTERNAL_ERROR, "waitResp: No response type indicator")
 
             respType = resp['rsp'][0]
             if respType in wantType:
                 return resp
             elif respType == 'stat' and resp['state'][0] == 'disc':
                 self._stopHelper()
-                raise BTLEException(BTLEException.DISCONNECTED, "Device disconnected")
+                raise BTLEException(BTLEException.DISCONNECTED, "waitResp: Device disconnected")
             elif respType == 'err':
                 errcode=resp['code'][0]
-                raise BTLEException(BTLEException.COMM_ERROR, "Error from Bluetooth stack (%s)" % errcode)
+                raise BTLEException(BTLEException.COMM_ERROR, "waitResp: Error from Bluetooth stack (%s)" % errcode)
             else:
-                raise BTLEException(BTLEException.INTERNAL_ERROR, "Unexpected response (%s)" % respType)
+                raise BTLEException(BTLEException.INTERNAL_ERROR, "waitResp: Unexpected response ({}) Expected {}".format(respType,wantType))
 
     def status(self):
         self._writeCmd("stat\n")
-        return self._waitResp(['stat'])
+        return self._getResp(['stat'])
 
 
 class Peripheral(Bluepy):
